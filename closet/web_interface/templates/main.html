@@ -1,0 +1,29 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+
+{% if err != None %}
+<script>
+	alert({{ err }});
+</script>
+{% endif %}
+
+<link rel="stylesheet" href="{% static 'css/main.css' %}" type="text/css">
+
+<div class="expenses-viewer">
+	<div class="expenses-sheet">
+		{% for expense in expenses %}
+		<div class="container">
+			<img src="{% static expense.image|link_creator %}" class="expense-image">
+			<div class="expense-description">
+				<a class="p-2 text-dark" href="/crm/expenses-{{ expense.id }}">{{ expense.name }}</a>
+			</div>
+			<div class="expense-quantity">
+				<a>{{ expense.quantity }}</a>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+
+{% endblock content %}
