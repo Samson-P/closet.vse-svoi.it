@@ -3,8 +3,9 @@ from . import views
 
 
 urlpatterns = [
-    path('login_page', views.login_page),
+    path('login_page/', views.login_page),
     path('error', views.error_page),
+    path('', views.main),
     path('main', views.main),
     path('crm/expenses-<int:expenses_id>', views.refactor_expenses),
     path('crm/add_expenses', views.add_expenses),

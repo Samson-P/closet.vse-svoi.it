@@ -1,5 +1,5 @@
 from django.contrib import admin
-# from .models import модельки
+from .models import Personnel, Expenses, Log, Notes
 
 
 # @admin.register(Personnel)
@@ -9,4 +9,7 @@ from django.contrib import admin
 # Register your models here.
 
 
-# admin.site.register(model)
+admin.site.register(Personnel)
+admin.site.register(Expenses)
+admin.site.register(Log)
+admin.site.register(Notes)

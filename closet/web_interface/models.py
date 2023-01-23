@@ -15,7 +15,7 @@ class Personnel(models.Model):
     discord = models.CharField(max_length=32, verbose_name="Дискорд аккаунт", blank=True, null=True)
 
     # Личные данные
-    image = models.ImageField(verbose_name="Фотография", blank=True, null=True, upload_to="gallery/img/person_avatars")
+    image = models.ImageField(verbose_name="Фотография", blank=True, null=True, upload_to="static/img/png/avatars")
     personal_information = models.CharField(max_length=512, verbose_name="Личная информация", blank=True, null=True)
     social_media_status = models.CharField(max_length=16, verbose_name="Статус", blank=True, null=True)
 
@@ -37,6 +37,8 @@ class Expenses(models.Model):
     name = models.CharField(max_length=128, verbose_name="Наименование расходного материала (развернуто)")
     # Количество в штуках или метрах
     quantity = models.CharField(max_length=8, verbose_name="Количество (шт/м)")
+    # Изображение расходного материала
+    image = models.ImageField(verbose_name="Фотография", upload_to="web_interface/static/img/png/expenses")
 
     def __str__(self):
         return self.short_name

@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+	<title>vse-svoi.closet</title>
+	<meta charset="UTF-8">
+	
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+	{% load static %}
+	<link rel="stylesheet" href="{% static 'css/signin.css' %}" type="text/css">
+	<link rel="shortcut icon" type="image/ico" href="{% static 'img/ico/signin.ico' %}"/>
+	
+</head>
+	<body class="text-center">
+		<form class="form-signin" method="POST">
+			{% csrf_token %}
+			<img class="mb-4" href="{% static 'img/png/signin_businessman.png' %}" alt="" width="80" height="80">
+			<h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+			<label for="loginOfUser" class="sr-only">Username</label>
+			<input id="loginOfUser" type = "text" name="loginOfUser" class="form-control" placeholder="Email address">
+			<label for="passwordOfUser" class="sr-only">Password</label>
+			<input type="password" name="passwordOfUser" id="passwordOfUser" class="form-control" placeholder="Password" required="">
+			<div class="checkbox mb-3">
+				<label>
+					<input type="checkbox" value="remember-me"> Remember me
+				</label>
+			</div>
+			<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+			<p class="mt-5 mb-3 text-muted">© 2021-2022</p>
+		</form>
+
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
