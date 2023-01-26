@@ -34,7 +34,7 @@ class Expenses(models.Model):
     # Короткое наименование для логирования
     short_name = models.CharField(max_length=32, verbose_name="Короткое название расходного материала")
     # Наименование для описания материала
-    name = models.CharField(max_length=128, verbose_name="Наименование расходного материала (развернуто)")
+    name = models.TextField(max_length=128, verbose_name="Наименование расходного материала (развернуто)")
     # Количество в штуках или метрах
     quantity = models.CharField(max_length=8, verbose_name="Количество (шт/м)")
     # Изображение расходного материала
