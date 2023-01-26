@@ -1,0 +1,16 @@
+Включение venv (если сама не активировалась)
+Set-ExecutionPolicy RemoteSigned
+C:\Users\samson\Documents\GitHub\closet.vse-svoi.it\venv\Scripts\activate.ps1
+
+Копирование таблицы БД с одного ПК на другой
+Вход
+psql -Upostgres -hlocalhost -dcloset-it
+Копирование
+\COPY web_interface_expenses TO ‘C:\Users\samson\expenses.csv’ DELIMITER ‘,’ CSV HEADER;
+Вставляем
+\COPY web_interface_expenses FROM ‘C:\Users\\samson\Downloads\expenses.csv’ DELIMITER ‘,’ CSV HEADER;
+
+На моменте вставки БД уже должна быть создана на втором ПК. Я создал ее обычной миграцией Django.
+
+Посмотреть таблицы БД
+\dt;
