@@ -2,6 +2,51 @@
 {% load static %}
 {% block content %}
 
-<h1>Изменяем или удаляем запись расходника в БД.</h1>
+{% if meta == "CHOICE" %}
+
+
+<h2>На этой странице смотрим, изменяем или удаляем запись расходника в БД.</h2>
+<p>ID расходного материала не задан, выбери интересующую позицию
+    в выпадающем меню или перейди по ссылке объекта на <a href="/">начальной странице</a>.</p>
+<form method="post">
+    {% csrf_token %}
+    <p></p>
+        {{ form.media }}
+        {{ form.as_p }}
+    <p><input type="submit" name="show" value="Выбрать"></p>
+</form>
+
+
+{% elif meta == "VIEW" %}
+
+
+<h3>{{ expense.short_name }}</h3>
+<img src="{% static expense.image|image_url %}">
+<p>{{ expense.name }}</p>
+<p>{{ expense.quantity }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <div style="visibility: hidden;">
+        {{ form.media }}
+        {{ form.as_p }}
+    </div>
+    <p><input type="submit" name="refactor" value="Изменить"></p>
+</form>
+
+
+{% elif meta == "EDITING" %}
+
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p></p>
+        {{ form.media }}
+        {{ form.as_p }}
+    <p><input type="submit" name="apply" value="Внести изменения"></p>
+</form>
+
+
+{% endif %}
 
 {% endblock content %}

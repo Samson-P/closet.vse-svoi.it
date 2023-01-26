@@ -1,28 +1,32 @@
-# Create your views here.
-import datetime
-
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template.defaulttags import register
 from .models import Personnel, Expenses, Log, Notes
 
 # ORM помощник (client side)
-# from .forms import TaskAddForm, GanttFilterForm, AddMoreForm
+from .forms import expenses_form, exists_expenses_form, refactor_expenses_form
 # from .filters import get_query
 
 # LogIn
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
-from django.http import HttpResponseRedirect
 
 # ORM запросы
 from django.db.models import Q
 
+# Работа с изображениями
+from .crop_and_format_img import image_formatting
+
 
 # Декораторы
 @register.filter
-def link_creator(path):
+def image_url_miniature(path):
     return f"img/png/expenses/{str(path).split('/')[-1]}"
+
+
+@register.filter
+def image_url(path):
+    return f"img/jpeg/expenses/{str(path).split('/')[-1].split('.')[0]}.jpeg"
 
 
 # Страница авторизации
@@ -61,12 +65,48 @@ def add_expenses(request):
 
 
 # Страница просмотра/изменения расходника (чтение/редактирование записи в БД)
-def refactor_expenses(request):
-    # Логика работы фильтров
-    # tasks, filters = crm_task_filter(request)
+def refactor_expenses(request, expenses_id=None):
+    # GET запрос
+    if request.method == 'GET':
+        # Если expenses_id не пустой, вытаскиваем объект класса
+        if expenses_id is not None:
+            expense = Expenses.objects.get(pk=expenses_id)
+            form = exists_expenses_form(instance=expense)
+            meta = "VIEW"
+        # Если expenses_id пустой
+        else:
+            expense = None
+            form = expenses_form()
+            meta = "CHOICE"
+
+    # POST запрос
+    if request.method == 'POST':
+        # Если пост запрос со страницы /crm/expenses, то достаем из БД выбранную запись
+        if 'show' in request.POST:
+            expenses_id = request.POST['expenses']
+            return redirect(f'/crm/expenses-{expenses_id}')
+        # Если пост запрос на редактирование, то достаем из БД выбранную запись и заполняем ей форму
+        elif 'refactor' in request.POST:
+            expense = Expenses.objects.get(pk=expenses_id)
+            form = refactor_expenses_form(instance=expense)
+            expense = None
+            meta = "EDITING"
+        # Если пост запрос на применение изменений, то достаем из БД измененную запись
+        elif 'apply' in request.POST:
+            form = refactor_expenses_form(request.POST, request.FILES)
+            if form.is_valid():
+                # Обновляем фото в БД
+                expense = Expenses.objects.get(pk=expenses_id)
+                expense.image = image_formatting(POST_FILES=request.FILES['file'], pre_name=expense.short_name)
+                expense.save()
+
+                return redirect(f'/crm/expenses-{expenses_id}')
+            else:
+                expense = None
+                meta = "EDITING"
 
     # формируем список для страницы
-    context = {'tasks': "", 'filters': "", 'err': None}
+    context = {'expense': expense, 'form': form, 'meta': meta, 'err': None}
 
     return render(request, 'refactor_expenses.html', context)
 
