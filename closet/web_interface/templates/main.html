@@ -14,7 +14,7 @@
 	<div class="expenses-sheet">
 		{% for expense in expenses %}
 		<div class="container">
-			<img src="{% static expense.image|link_creator %}" class="expense-image">
+			<img src="{% static expense.image|image_url_miniature %}" class="expense-image">
 			<div class="expense-description">
 				<a class="p-2 text-dark" href="/crm/expenses-{{ expense.id }}">{{ expense.name }}</a>
 			</div>
