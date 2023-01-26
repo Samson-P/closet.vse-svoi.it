@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.template.defaulttags import register
 from .models import Personnel, Expenses, Log, Notes
+from django.http import HttpResponseRedirect
 
 # ORM помощник (client side)
-from .forms import expenses_form, exists_expenses_form, refactor_expenses_form
+from .forms import *
 # from .filters import get_query
 
 # LogIn
@@ -71,12 +72,12 @@ def refactor_expenses(request, expenses_id=None):
         # Если expenses_id не пустой, вытаскиваем объект класса
         if expenses_id is not None:
             expense = Expenses.objects.get(pk=expenses_id)
-            form = exists_expenses_form(instance=expense)
+            form = ExistsExpensesForm(instance=expense)
             meta = "VIEW"
         # Если expenses_id пустой
         else:
             expense = None
-            form = expenses_form()
+            form = ExpensesForm()
             meta = "CHOICE"
 
     # POST запрос
@@ -88,16 +89,34 @@ def refactor_expenses(request, expenses_id=None):
         # Если пост запрос на редактирование, то достаем из БД выбранную запись и заполняем ей форму
         elif 'refactor' in request.POST:
             expense = Expenses.objects.get(pk=expenses_id)
-            form = refactor_expenses_form(instance=expense)
+
+            class form(object):
+                form_image = RefactorExpensesImageForm
+                form_date = RefactorExpensesDataForm(instance=expense)
             expense = None
             meta = "EDITING"
-        # Если пост запрос на применение изменений, то достаем из БД измененную запись
-        elif 'apply' in request.POST:
-            form = refactor_expenses_form(request.POST, request.FILES)
+        # Если пост запрос на применение изменений, то сохраняем и достаем из БД измененную запись
+        elif 'apply-image' in request.POST:
+            form = RefactorExpensesImageForm(request.POST, request.FILES)
             if form.is_valid():
-                # Обновляем фото в БД
                 expense = Expenses.objects.get(pk=expenses_id)
+                # Обновляем фото в БД (почитать подробно можно в модуле crop_and_format_img в комментариях)
                 expense.image = image_formatting(POST_FILES=request.FILES['file'], pre_name=expense.short_name)
+                expense.save()
+
+                return redirect(f'/crm/expenses-{expenses_id}')
+            else:
+                expense = None
+                meta = "EDITING"
+        elif 'apply-data' in request.POST:
+            form = RefactorExpensesDataForm(request.POST)
+            print('Hello')
+            if form.is_valid():
+                print('Hello')
+                expense = Expenses.objects.get(pk=expenses_id)
+                expense.short_name = request.POST['short_name']
+                expense.name = request.POST['name']
+                expense.quantity = request.POST['quantity']
                 expense.save()
 
                 return redirect(f'/crm/expenses-{expenses_id}')

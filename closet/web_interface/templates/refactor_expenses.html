@@ -27,10 +27,6 @@
 
 <form method="post">
     {% csrf_token %}
-    <div style="visibility: hidden;">
-        {{ form.media }}
-        {{ form.as_p }}
-    </div>
     <p><input type="submit" name="refactor" value="Изменить"></p>
 </form>
 
@@ -38,12 +34,21 @@
 {% elif meta == "EDITING" %}
 
 
+<h2>Данные полей записи в БД</h2>
+<form method="post">
+    {% csrf_token %}
+    <p></p>
+        {{ form.form_date.media }}
+        {{ form.form_date.as_p }}
+    <p><input type="submit" name="apply-data" value="Изменить данные"></p>
+</form>
+
+<h2>Обновить изображение</h2>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <p></p>
-        {{ form.media }}
-        {{ form.as_p }}
-    <p><input type="submit" name="apply" value="Внести изменения"></p>
+        {{ form.form_image }}
+    <p><input type="submit" name="apply-image" value="Изменить изображение"></p>
 </form>
 
 

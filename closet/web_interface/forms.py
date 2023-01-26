@@ -3,7 +3,7 @@ from django.forms import Form, ModelForm, ModelMultipleChoiceField, FileField, I
 
 
 # Форма для выбора конкретной позиции из БД на странице редактирования расходников
-class expenses_form(Form):
+class ExpensesForm(Form):
 	# ...
 
 	expenses = ModelMultipleChoiceField(
@@ -11,7 +11,7 @@ class expenses_form(Form):
 	)
 
 
-class exists_expenses_form(ModelForm):
+class ExistsExpensesForm(ModelForm):
 	# Форма для редактирования записи расходника
 
 	class Meta:
@@ -19,11 +19,12 @@ class exists_expenses_form(ModelForm):
 		fields = "__all__"
 
 
-class refactor_expenses_form(ModelForm):
+class RefactorExpensesImageForm(Form):
 	# Форма для редактирования записи расходника
 	file = FileField()
 
+
+class RefactorExpensesDataForm(ModelForm):
 	class Meta:
 		model = Expenses
 		fields = ['short_name', 'name', 'quantity']
-
