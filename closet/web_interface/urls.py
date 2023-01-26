@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.main),
     path('main', views.main),
     path('crm/expenses-<int:expenses_id>', views.refactor_expenses),
+    path('crm/expenses', views.refactor_expenses),
     path('crm/add_expenses', views.add_expenses),
     path('account/@<str:signa>', views.account),
     path('log', views.log),
