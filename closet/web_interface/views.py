@@ -1,3 +1,6 @@
+import datetime
+import os
+
 from django.shortcuts import render, redirect
 from django.template.defaulttags import register
 from .models import Personnel, Expenses, Log, Notes
@@ -148,7 +151,41 @@ def log(request):
 
 # Заметки
 def notes(request):
-    return render(request, 'notes.html')
+    if request.user.is_authenticated:   # Страница откроется только авторизованному пользователю
+        err = None
+        if request.method == "POST":    # Со стороны клиента было отправлено сообщение
+            if len(request.POST['send-message']) != 0:  # Если оно не пустое, обрабатываем
+                form = AddNoteForm(request.POST)
+                if form.is_valid():     # Если форма валидна, заполняем поля как следует
+                    id_creator = Personnel.objects.get(user=request.user)
+
+                    if request.POST['id_expenses'] == '':
+                        expense_id = None
+                    else:
+                        expense_id = Expenses.objects.get(pk=request.POST['id_expenses'])
+
+                    note = Notes.objects.create(
+                        creator_id=id_creator, status=request.POST['status'],
+                        description=request.POST['send-message'],
+                        id_expenses=expense_id
+                    )
+                    note.save()
+                else:
+                    pass
+            else:   # Если оно пустое, отправляем alert
+                err = "Сообщение не должно быть пустым ;)"
+
+        # Логика страницы: форма и данные
+        form = AddNoteForm()
+        notice = Notes.objects.all()
+
+        if len(notice) == 0:    # Если заметок пока нет, показываем красивое предложение начать
+            notice = None
+
+        context = {'notes': notice, 'form': form, 'err': err}
+        return render(request, 'notes.html', context)
+    else:
+        return redirect('/login_page')
 
 
 def settings(request):

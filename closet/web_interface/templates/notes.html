@@ -2,6 +2,73 @@
 {% load static %}
 {% block content %}
 
-<h1>Здесь выводим инвайты от пользователей, просто Заметки, никакой бизнес логики</h1>
+<script src="{% static 'js/jquery-2.0.2.min.js' %}"></script>
+<script src="{% static 'js/fontawesome.8f5e978f28.js' %}" crossorigin="anonymous"></script>
+<script src="{% static 'js/notes.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/notes.css' %}" type="text/css">
+
+    <!-- script error reaction -->
+<script type="text/javascript">
+{% if err != None %}
+    alert( " {{ err }} " );
+{% endif %}
+</script>
+	<!-- end script error reaction -->
+
+
+
+<div class="notes-box">
+    <div class="sheet-notes">
+    {% if notes == None %}
+        <div class="notes-if-empty">
+            <p>В этой переписке пока нет сообщений, отправьте первое сообщение!</p>
+            <div></div>
+        </div>
+    {% else %}
+        {% for note in notes %}
+        <div class="container">
+            <p>
+                {% if note.status == "INVITE" %}
+                    <a style="color: green;">[{{ note.status }}]</a>
+                {% else %}
+                    <a style="color: red;">[{{ note.status }}]</a>
+                {% endif %}
+                <a class="p-2 text-dark">{{ note.description }}</a>
+                {% if note.id_expenses == None %}
+                <p><a style="color: grey;">Расходник не задан</a></p>
+                {% else %}
+                <p><a href="/crm/expenses-{{ note.id_expenses.id }}">{{ note.id_expenses }}</a></p>
+                {% endif %}
+            </p>
+            <img src="{{ note.creator_id.image }}" class="left avatar" title="{{ note.creator_id.user }}">
+            <span class="time-right">{{ note.created_dt }}</span>
+        </div>
+        {% endfor %}
+    {% endif %}
+    </div>
+
+    <div class="note-entry-field">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="b-container" id="activate">
+                <a href="javascript:PopUpShow()">Показать доп. поля (2)</a>
+            </div>
+            <div class="b-popup" id="deactivate">
+                <div class="b-popup-content">
+                    {{ form.as_p }}
+                <a href="javascript:PopUpHide()">Скрыть доп. поля</a>
+                </div>
+            </div>
+
+            <div id="senddesc">
+                <textarea name="send-message" placeholder="Начните писать..."></textarea>
+                <button type="submit"></button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
 
 {% endblock content %}

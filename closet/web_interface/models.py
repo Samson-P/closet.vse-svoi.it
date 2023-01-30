@@ -15,7 +15,7 @@ class Personnel(models.Model):
     discord = models.CharField(max_length=32, verbose_name="Дискорд аккаунт", blank=True, null=True)
 
     # Личные данные
-    image = models.ImageField(verbose_name="Фотография", blank=True, null=True, upload_to="static/img/png/avatars")
+    image = models.ImageField(verbose_name="Фотография", blank=True, null=True, upload_to="web_interface/static/img/png/avatars")
     personal_information = models.CharField(max_length=512, verbose_name="Личная информация", blank=True, null=True)
     social_media_status = models.CharField(max_length=16, verbose_name="Статус", blank=True, null=True)
 
@@ -45,14 +45,20 @@ class Expenses(models.Model):
 
 
 class Log(models.Model):
+    STATUS = (
+        ('РАСХОД', 'Потратил на выезд'),
+        ('ЗАКУПКА', 'Добавил из закупки'),
+        ('ИЗМЕНЕНИЕ', 'Внес изменение'),
+        ('УДАЛЕНИЕ', 'Удалил'),
+    )
     # Дата реализации действия с расходным материалом
     created_dt = models.DateTimeField(verbose_name="Дата", auto_now_add=True)
     # ID кадра, оставившего лог (в клиенте будет отображаться { last_name + first_name })
     creator_id = models.ForeignKey(Personnel, verbose_name="Создатель", on_delete=models.CASCADE)
     # Статус действия по отношению к расходному материалу
-    status = models.TextChoices('Статус', 'РАСХОД ЗАКУПКА ИЗМЕНЕНИЕ УДАЛЕНИЕ')
+    status = models.CharField(max_length=16, verbose_name='Статус', choices=STATUS)
     # Номер заявки в мониторинге mantis
-    task_url = models.CharField(max_length=6, verbose_name="Номер задачи mantis")
+    task_url = models.CharField(max_length=7, verbose_name="Номер задачи mantis")
     # ID расходного материала (в клиенте будет отображаться полное наименование { name })
     id_expenses = models.ForeignKey(Expenses, verbose_name="Расходник", on_delete=models.CASCADE)
     # Количество в штуках или метрах
@@ -66,12 +72,17 @@ class Log(models.Model):
 
 
 class Notes(models.Model):
+    STATUS = (
+        ('TASK', 'Нужно выполнить следующее'),
+        ('INVITE', 'Оповещение для своих'),
+    )
+
     # Дата регистрации заметки
     created_dt = models.DateTimeField(verbose_name="Дата", auto_now_add=True)
     # ID кадра, оставившего сообщение (в клиенте будет отображаться { last_name + first_name })
     creator_id = models.ForeignKey(Personnel, verbose_name="Отправитель", on_delete=models.CASCADE)
     # Статус: пишем, что надо что-то сделать (TASK = Задание); что мы (планируем) сделали(-ть) (INVITE = Сообщение)
-    status = models.TextChoices('Status', 'TASK INVITE')
+    status = models.CharField(max_length=16, verbose_name='Статус', choices=STATUS)
     # Содержание
     description = models.CharField(max_length=512, verbose_name="Содержание")
     # ID расходного материала (в клиенте будет отображаться полное наименование { name })

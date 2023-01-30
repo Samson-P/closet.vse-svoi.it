@@ -1,4 +1,4 @@
-from .models import Expenses
+from .models import Expenses, Log, Notes
 from django.forms import Form, ModelForm, ModelMultipleChoiceField, FileField, ImageField
 
 
@@ -28,3 +28,9 @@ class RefactorExpensesDataForm(ModelForm):
 	class Meta:
 		model = Expenses
 		fields = ['short_name', 'name', 'quantity']
+
+
+class AddNoteForm(ModelForm):
+	class Meta:
+		model = Notes
+		fields = ['status', 'id_expenses']
