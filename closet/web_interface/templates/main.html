@@ -4,7 +4,7 @@
 
 {% if err != None %}
 <script>
-	alert({{ err }});
+	alert("{{ err }}");
 </script>
 {% endif %}
 
@@ -19,8 +19,19 @@
 				<a class="p-2 text-dark" href="/crm/expenses-{{ expense.id }}">{{ expense.name }}</a>
 			</div>
 			<div class="expense-quantity">
-				<a>{{ expense.quantity }}</a>
+				<form method="post">
+					{% csrf_token %}
+					<input type="text" size="6" name="expense" value="{{ expense.id }}" style="visibility: collapse;">
+					<input type="text" size="6" name="task" placeholder="№ Задачи" maxlength="7">
+					<div class="number">
+						<button class="number-minus" type="button" onclick="this.nextElementSibling.stepDown(); this.nextElementSibling.onchange();">-</button>
+						<input type="number" min="0" name="count" value="{{ expense.quantity }}" readonly>
+						<button class="number-plus" type="button" onclick="this.previousElementSibling.stepUp(); this.previousElementSibling.onchange();">+</button>
+					</div>
+					<input type="submit" size="6" value="Я беру!">
+				</form>
 			</div>
+
 		</div>
 		{% endfor %}
 	</div>
