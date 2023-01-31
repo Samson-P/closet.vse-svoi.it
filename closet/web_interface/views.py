@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 
 # ORM помощник (client side)
 from .forms import *
-# from .filters import get_query
+from .filters import get_query
 
 # LogIn
 from django.contrib.auth.models import User
@@ -34,6 +34,21 @@ def image_url_miniature(path):
 @register.filter
 def image_url(path):
     return f"img/jpeg/expenses/{str(path).split('/')[-1].split('.')[0]}.jpeg"
+
+
+@register.filter
+def fist_second_name(fs_name):
+    second, first = str(fs_name).split(' ')
+    return f'{second} {first[0]}.'
+
+
+@register.filter
+def time_logs(dt, mode='default'):
+    if mode == 'ym':
+        result = dt.strftime("%d %H:%M")
+    else:  # mode == 'default'
+        result = dt.strftime("%d.%m.%y %H:%M")
+    return result
 
 
 # Страница авторизации
@@ -213,8 +228,89 @@ def account(request):
 # Журнал
 def log(request):
     if request.user.is_authenticated:
-        logs = Log.objects.all()
-        return render(request, 'log.html', {'logs': logs})
+        err = None
+
+        if request.method == "POST":
+            logs = None
+            mode = 'default'
+            # Изменили поле даты
+            if request.POST['date'] != '':
+                year, month = request.POST['date'].split('-')[0:2]
+                logs = Log.objects.filter(
+                    created_dt__year=year,
+                    created_dt__month=month
+                )
+                mode = 'ym'
+            # Изменили поле КАДР
+            if request.POST['person'] != '':
+                if logs is None:    # Поле даты не меняли
+                    year = datetime.datetime.now().strftime("%Y")
+                    query_string = request.POST['person']
+                    search_fields = ['first_name', 'last_name']
+                    entry_query = get_query(query_string, search_fields)
+
+                    if entry_query is not None:     # Не пустой запрос получился
+                        persons = Personnel.objects.filter(entry_query)
+                        logs = Log.objects.filter(
+                            created_dt__year=year,
+                            creator_id__in=persons
+                        )
+                    else:   # Если запрос пустой, выдаем по дефолту
+                        logs = Log.objects.all()[:10]
+                    mode = 'default'
+                else:   # Поле даты меняли
+                    query_string = request.POST['person']
+                    search_fields = ['first_name', 'last_name']
+                    entry_query = get_query(query_string, search_fields)
+                    if entry_query is not None:     # Не пустой запрос накладывается на выборку по дате
+                        persons = Personnel.objects.filter(entry_query)
+
+                        logs = logs.filter(
+                            creator_id__in=persons
+                        )
+                    else:   # Если запрос пуст, пропускаем и идем дальше
+                        pass
+                    mode = 'ym'
+
+            # Изменили поле Ключевые Слова
+            if request.POST['keyword'] != '':
+                if logs is None:    # Поля до этого не меняли
+                    year = datetime.datetime.now().strftime("%Y")
+                    query_string = request.POST['keyword']
+                    search_fields = ['status', 'task_url', 'quantity']
+                    entry_query = get_query(query_string, search_fields)
+                    if entry_query is not None:  # Не пустой запрос накладывается на выборку по дате
+                        logs = Log.objects.filter(
+                            created_dt__year=year
+                        )
+                        logs = logs.filter(entry_query)
+                    else:   # Если запрос пустой, выдаем по дефолту
+                        logs = Log.objects.all()[:10]
+                    mode = 'default'
+                else:   # Поля до этого меняли
+                    query_string = request.POST['keyword']
+                    search_fields = ['creator_id', 'status', 'description', 'id_expenses']
+                    entry_query = get_query(query_string, search_fields)
+                    if entry_query is not None:     # Не пустой запрос накладывается на выборку по дате
+                        logs = Log.objects.filter(
+                            created_dt__year=year
+                        )
+                        logs = logs.filter(entry_query)
+                    else:   # Если запрос пуст, пропускаем и идем дальше
+                        pass
+                    mode = 'ym'
+
+            if logs is None:
+                logs = Log.objects.all()[:10]
+
+        elif request.method == "GET":
+            # Получим первые 10 строк из таблицы
+            logs = Log.objects.all()[:10]
+            mode = 'default'
+
+        context = {'logs': logs, 'mode': mode, 'err': err}
+
+        return render(request, 'log.html', context)
     else:
         return redirect('/login_page')
 

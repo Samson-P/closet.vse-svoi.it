@@ -2,6 +2,81 @@
 {% load static %}
 {% block content %}
 
-<h1>Регистрация событий перемещения (РАСХОДА) материалов, автоматическая</h1>
+{% if err != None %}
+<script>
+	alert({{ err }});
+</script>
+{% endif %}
+
+<link rel="stylesheet" href="{% static 'css/log.css' %}" type="text/css">
+
+
+<div class="log-viewer">
+
+    <div class="filters">
+        <form method="post">
+            {% csrf_token %}
+            <div class="date-filter">
+                <input type="date" name="date" title="Критичны месяц и год!">
+            </div>
+            <div class="person-filter">
+                {% if filter != None %}
+                <input type="text" name="person" placeholder="Имя/ф. кадра" title="Поиск по ФИО">
+                {% else %}
+                <input type="text" name="person" placeholder="Имя/ф. кадра" title="Поиск по ФИО" value="{{ filter.person }}">
+                {% endif %}
+            </div>
+            <div class="key-filter">
+                {% if filter != None %}
+                <input type="text" name="keyword" placeholder="Ключевое слово" title="Поиск по ключевым словам">
+                {% else %}
+                <input type="text" name="keyword" placeholder="Ключевое слово" title="Поиск по ключевым словам" value="{{ filter.keyword }}">
+                {% endif %}
+            </div>
+            <div class="submit-filters">
+                <input type="submit" name="filter-apply" title="Начать поиск" value="Найти!">
+            </div>
+        </form>
+    </div>
+
+    <table>
+        <caption>Журналированные перемещения за период [...]</caption>
+        <tr>
+            <th>Дата</th>
+            <th>Задача</th>
+            <th>Исполнитель</th>
+            <th>Тип действия</th>
+            <th>Количество</th>
+            <th>Материал</th>
+        </tr>
+
+    {% for log in logs %}
+        <tr>
+            <td>{{ log.created_dt|time_logs:mode }}</td>
+
+            <td>
+                <a href="http://mantis.vse-svoi.net/view.php?id={{ log.task_url }}">{{ log.task_url }}</a>
+            </td>
+
+            <td>
+                <a href="http://closet-it.ru/@{{ log.creator_id.user }}">{{ log.creator_id|fist_second_name }}</a>
+            </td>
+
+            <td>
+                {{ log.status }}
+            </td>
+
+            <td>
+                {{ log.quantity }}
+            </td>
+
+            <td>
+                <a href="/crm/expenses-{{ log.id_expenses.id }}">{{ log.id_expenses }}</a>
+            </td>
+        </tr>
+    {% endfor %}
+  </table>
+</div>
+
 
 {% endblock content %}

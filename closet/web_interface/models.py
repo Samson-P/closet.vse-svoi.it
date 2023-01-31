@@ -67,8 +67,11 @@ class Log(models.Model):
     # Описание действия в клиентской части приложения будет создаваться на основании всех выше перечисленных данных
     # Дата, Номер заявки (если это РАСХОД), Фамилия Имя, Количество, Полное наименование расходника
 
+    class Meta:
+        ordering = ["-created_dt"]
+
     def __str__(self):
-        return f'{self.created_dt} {self.created_dt} {self.status}'
+        return f'{self.created_dt} {self.creator_id} {self.status}'
 
 
 class Notes(models.Model):
