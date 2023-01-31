@@ -2,3 +2,6 @@ psycopg2
 Pillow
 Django
 transliterate
+aiogram
+requests
+telebot

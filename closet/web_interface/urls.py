@@ -14,4 +14,5 @@ urlpatterns = [
     path('log', views.log),
     path('notes', views.notes),
     path('settings', views.settings),
+    path('support', views.support),
 ]

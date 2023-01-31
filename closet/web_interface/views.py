@@ -21,6 +21,9 @@ from django.db.models import Q
 # Работа с изображениями
 from .crop_and_format_img import image_formatting
 
+# API TG, ALERTS
+from .sup_bot import send_support_message
+
 
 # Декораторы
 @register.filter
@@ -76,12 +79,12 @@ def main(request):
                     status = 'РАСХОД'
                 else:
                     status = 'ИЗМЕНЕНИЕ'
-                id_creator = Personnel.objects.get(user=request.user).user
+                id_creator = Personnel.objects.get(user=request.user)
                 log_line = Log.objects.create(
                     creator_id=id_creator, id_expenses=one_expense,
                     status=status, task_url=request.POST['task'],
                     quantity=abs(count)
-                    )
+                )
                 log_line.save()
                 one_expense.quantity = request.POST['count']
                 one_expense.save()
@@ -258,5 +261,52 @@ def notes(request):
 def settings(request):
     if request.user.is_authenticated:
         return render(request, 'settings.html')
+    else:
+        return redirect('/login_page')
+
+
+def support(request):
+    if request.user.is_authenticated:
+        err = None
+        if request.method == "POST":
+            form = TechnicalSupportForm(request.POST)
+            if form.is_valid():
+                id_creator = Personnel.objects.get(user=request.user)
+                if 'attachments' in request.POST:
+                    attachment = None
+                else:
+                    attachment = request.FILES['attachments']
+                sup = TechnicalSupport.objects.create(
+                    creator_id=id_creator, theme=request.POST['theme'],
+                    description_of_the_problem=request.POST['description_of_the_problem'],
+                    logs=request.POST['logs'],
+                    attachments=attachment,
+                )
+                sup.save()
+
+                # Отправляем сообщение в бот ТГ
+                alert = TechnicalSupport.objects.all()[0]
+
+                #if attachment is not None:
+                #    with open(str(alert.attachments), "rb") as misc:
+                #        attachment = misc.read()
+                #else:
+                #    pass
+                
+                response = send_support_message(alert.theme, alert.description_of_the_problem, alert.logs,
+                                                alert.attachments)
+                if response == 200:
+                    err = "Сообщение доставлено!"
+                else:
+                    err = response
+
+                # Обнуляем форму
+                form = TechnicalSupportForm()
+        else:
+            form = TechnicalSupportForm()
+
+        context = {'form': form, 'err': err}
+
+        return render(request, 'support.html', context)
     else:
         return redirect('/login_page')

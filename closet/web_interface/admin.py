@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Personnel, Expenses, Log, Notes
+from .models import *
 
 
 # @admin.register(Personnel)
@@ -13,3 +13,4 @@ admin.site.register(Personnel)
 admin.site.register(Expenses)
 admin.site.register(Log)
 admin.site.register(Notes)
+admin.site.register(TechnicalSupport)

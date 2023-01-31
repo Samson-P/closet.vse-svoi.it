@@ -1,0 +1,21 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+
+{% if err != None %}
+<script>
+	alert("{{ err }}");
+</script>
+{% endif %}
+
+<h3>Поддержка. Отправим разработчику в Telegram.</h3>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p>Заполните форму.</p>
+        {{ form.media }}
+        {{ form.as_p }}
+    <p><input type="submit" name="apply" value="Добавить"></p>
+</form>
+
+{% endblock content %}

@@ -91,3 +91,27 @@ class Notes(models.Model):
 
     def __str__(self):
         return f'{self.creator_id} {self.status} {self.id_expenses}'
+
+
+class TechnicalSupport(models.Model):
+    # Дата регистрации
+    created_dt = models.DateTimeField(verbose_name="Дата", auto_now_add=True)
+    # ID кадра, оставившего сообщение
+    creator_id = models.ForeignKey(Personnel, verbose_name="Отправитель", on_delete=models.CASCADE)
+    # Тема обращения к ТП
+    theme = models.CharField(max_length=32, verbose_name="Тема обращения")
+    # Содержание
+    description_of_the_problem = models.TextField(verbose_name="Содержание")
+    # Логи
+    logs = models.TextField(verbose_name="Логи", blank=True, null=True)
+    # verbose_name="Вложения"
+    # для формы widget=forms.ClearableFileInput(attrs={'multiple': True})
+    attachments = models.FileField(verbose_name="Файл или архив файлов",
+                                   upload_to='web_interface/static/attachment/%Y/%m',
+                                   default='none', null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_dt"]
+
+    def __str__(self):
+        return f'{self.creator_id}, {self.theme}'
