@@ -38,8 +38,8 @@
 <form method="post">
     {% csrf_token %}
     <p></p>
-        {{ form.form_date.media }}
-        {{ form.form_date.as_p }}
+        {{ form.form_data.media }}
+        {{ form.form_data.as_p }}
     <p><input type="submit" name="apply-data" value="Изменить данные"></p>
 </form>
 
@@ -49,6 +49,11 @@
     <p></p>
         {{ form.form_image }}
     <p><input type="submit" name="apply-image" value="Изменить изображение"></p>
+</form>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p><input type="submit" name="delete" value="Удалить тип <{{ expense.short_name }}>"></p>
 </form>
 
 

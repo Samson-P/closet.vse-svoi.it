@@ -2,6 +2,13 @@
 {% load static %}
 {% block content %}
 
-<h1>Добавляем запись расходника в БД.</h1>
+<h2>Добавляем запись расходника в БД.</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p></p>
+        {{ form.media }}
+        {{ form.as_p }}
+    <p><input type="submit" name="apply" value="Добавить"></p>
+</form>
 
 {% endblock content %}
