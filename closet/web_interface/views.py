@@ -317,12 +317,12 @@ def log(request):
 
 # Заметки
 def notes(request):
-    if request.user.is_authenticated:   # Страница откроется только авторизованному пользователю
+    if request.user.is_authenticated:  # Страница откроется только авторизованному пользователю
         err = None
-        if request.method == "POST":    # Со стороны клиента было отправлено сообщение
+        if request.method == "POST":  # Со стороны клиента было отправлено сообщение
             if len(request.POST['send-message']) != 0:  # Если оно не пустое, обрабатываем
                 form = AddNoteForm(request.POST)
-                if form.is_valid():     # Если форма валидна, заполняем поля как следует
+                if form.is_valid():  # Если форма валидна, заполняем поля как следует
                     id_creator = Personnel.objects.get(user=request.user)
 
                     if request.POST['id_expenses'] == '':
@@ -338,14 +338,15 @@ def notes(request):
                     note.save()
                 else:
                     pass
-            else:   # Если оно пустое, отправляем alert
+            else:  # Если оно пустое, отправляем alert
                 err = "Сообщение не должно быть пустым ;)"
 
         # Логика страницы: форма и данные
         form = AddNoteForm()
-        notice = Notes.objects.all()
+        notice = Notes.objects.all()[:10]
+        notice = notice[::-1]
 
-        if len(notice) == 0:    # Если заметок пока нет, показываем красивое предложение начать
+        if len(notice) == 0:  # Если заметок пока нет, показываем красивое предложение начать
             notice = None
 
         context = {'notes': notice, 'form': form, 'err': err}

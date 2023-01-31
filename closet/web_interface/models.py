@@ -92,6 +92,9 @@ class Notes(models.Model):
     # Введено для удобства (можно не заполнять)
     id_expenses = models.ForeignKey(Expenses, verbose_name="Расходник", on_delete=models.CASCADE, blank=True, null=True)
 
+    class Meta:
+        ordering = ["-created_dt"]
+
     def __str__(self):
         return f'{self.creator_id} {self.status} {self.id_expenses}'
 
